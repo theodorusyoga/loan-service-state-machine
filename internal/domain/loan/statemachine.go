@@ -28,6 +28,12 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 		fsm.Callbacks{
 			"before_" + EventApprove: func(_ context.Context, e *fsm.Event) {
 				// TODO: Check document completeness
+				loan := e.Args[0].(*Loan)
+				err := s.validator.Validate(loan, Status(e.Src), Status(e.Dst))
+				if err != nil {
+					e.Cancel()
+					return
+				}
 			},
 			"after_" + EventApprove: func(_ context.Context, e *fsm.Event) {
 				loan := e.Args[0].(*Loan)
