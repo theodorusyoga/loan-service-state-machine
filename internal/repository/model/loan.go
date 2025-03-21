@@ -6,11 +6,11 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 )
 
-func (LoanModel) TableName() string {
+func (Loan) TableName() string {
 	return "loans"
 }
 
-type LoanModel struct {
+type Loan struct {
 	ID                string `gorm:"type:uuid;primary_key"`
 	Amount            float64
 	Status            string `gorm:"index;type:varchar(20)"`
@@ -26,7 +26,7 @@ type LoanModel struct {
 
 type JSON []loan.StatusTransition
 
-func (m *LoanModel) ToEntity() *loan.Loan {
+func (m *Loan) ToEntity() *loan.Loan {
 	return &loan.Loan{
 		ID:                m.ID,
 		Amount:            m.Amount,
@@ -42,8 +42,8 @@ func (m *LoanModel) ToEntity() *loan.Loan {
 	}
 }
 
-func FromEntity(l *loan.Loan) *LoanModel {
-	return &LoanModel{
+func FromEntity(l *loan.Loan) *Loan {
+	return &Loan{
 		ID:                l.ID,
 		Amount:            l.Amount,
 		Status:            string(l.Status),
@@ -58,7 +58,7 @@ func FromEntity(l *loan.Loan) *LoanModel {
 	}
 }
 
-func (m *LoanModel) ToDomain() *loan.Loan {
+func (m *Loan) ToDomain() *loan.Loan {
 	return &loan.Loan{
 		ID:                m.ID,
 		Amount:            m.Amount,

@@ -30,7 +30,7 @@ func (s *LoanService) CreateLoan(ctx context.Context, amount float64) (*Loan, er
 	id := uuid.New().String()
 	loan := NewLoan(id, amount)
 
-	if err := s.repository.Save(ctx, loan); err != nil {
+	if err := s.repository.Create(ctx, loan); err != nil {
 		return nil, err
 	}
 

@@ -1,0 +1,45 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+# Just plain old shell command. You could use `make` as well.
+cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ./cmd/api"
+# Binary file yields from `cmd`.
+bin = "tmp/main"
+# Watch these directories for changes
+include_dir = ["cmd", "internal", "pkg"]
+# Exclude files or directories
+exclude_dir = ["tmp", ".git", "vendor"]
+# Watch these file extensions
+include_ext = ["go", "yaml", "toml"]
+# Ignore these file extensions or directories
+exclude_regex = ["_test\\.go"]
+# This log file places in your tmp_dir.
+log = "air.log"
+# Poll files for changes instead of using fsnotify
+poll = false
+# Poll interval (in milliseconds)
+poll_interval = 500
+# It's not necessary to trigger rebuild each time file changes if it's too frequent.
+delay = 1000 # ms
+
+[log]
+# Show log time
+time = true
+# Only show main log (silences watcher, build, runner)
+main_only = false
+
+[color]
+# Customize each part's color.
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+# Delete tmp directory on exit
+clean_on_exit = true
+
+[screen]
+clear_on_rebuild = true
+keep_scroll = true
