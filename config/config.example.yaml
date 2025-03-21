@@ -1,0 +1,6 @@
+server:
+  port: "8080"
+
+database:
+  type: "cockroach"
+  url: "root:password@tcp(localhost:3306)/loan_system?parseTime=true"
