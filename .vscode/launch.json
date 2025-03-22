@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Go",
+            "name": "Connect to Air with Delve",
             "type": "go",
             "request": "attach",
             "mode": "remote",

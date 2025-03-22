@@ -6,6 +6,7 @@ tmp_dir = "tmp"
 cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ./cmd/api"
 # Binary file yields from `cmd`.
 bin = "tmp/main"
+full_bin = "dlv exec --accept-multiclient --api-version=2 --headless --listen=:2345 ./tmp/main"
 # Watch these directories for changes
 include_dir = ["cmd", "internal", "pkg"]
 # Exclude files or directories

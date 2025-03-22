@@ -8,9 +8,6 @@ import (
 )
 
 func main() {
-	// Running migrations
-	migrations.RunMigrations()
-
 	app := fx.New(
 		fx.Provide(
 			func() string {
@@ -23,4 +20,9 @@ func main() {
 	)
 
 	app.Run()
+}
+
+func migrate() {
+	// Running migrations
+	migrations.RunMigrations()
 }
