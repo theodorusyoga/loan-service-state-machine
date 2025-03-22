@@ -4,15 +4,39 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/theodorusyoga/loan-service-state-machine/config"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/handler"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/repository"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
+
+func ProvideValidator() *validator.Validate {
+	v := validator.New()
+
+	// Register a validator for ROI < Rate
+	v.RegisterValidation("roiLessThanRate", func(fl validator.FieldLevel) bool {
+		// Get the struct
+		parent := fl.Parent()
+
+		rateField := parent.FieldByName("Rate")
+		if !rateField.IsValid() {
+			return false
+		}
+		roi := fl.Field().Float()
+		rate := rateField.Float()
+
+		// ROI must be less than Rate
+		return roi < rate
+	})
+
+	return v
+}
 
 var Module = fx.Options(
 	InfrastructureModule,
@@ -39,10 +63,15 @@ var InfrastructureModule = fx.Module("infrastructure",
 			repository.NewLoanRepository,
 			fx.As(new(loan.Repository)),
 		),
+		fx.Annotate(
+			repository.NewBorrowerRepository,
+			fx.As(new(borrower.Repository)),
+		),
 	),
 )
 
 var APIModule = fx.Module("api", fx.Provide(
+	ProvideValidator,
 	handler.NewLoanHandler,
 	NewServer,
 ),

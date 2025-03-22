@@ -12,7 +12,10 @@ func (Loan) TableName() string {
 
 type Loan struct {
 	ID                string `gorm:"type:uuid;primary_key"`
+	BorrowerID        string `gorm:"type:uuid;index"`
 	Amount            float64
+	Rate              float64
+	ROI               float64
 	Status            string `gorm:"index;type:varchar(20)"`
 	ApprovalDate      *time.Time
 	ApprovedBy        string
@@ -26,10 +29,13 @@ type Loan struct {
 
 type JSON []loan.StatusTransition
 
-func (m *Loan) ToEntity() *loan.Loan {
+func (m *Loan) LoanToEntity() *loan.Loan {
 	return &loan.Loan{
 		ID:                m.ID,
+		BorrowerID:        m.BorrowerID,
 		Amount:            m.Amount,
+		Rate:              m.Rate,
+		ROI:               m.ROI,
 		Status:            loan.Status(m.Status),
 		ApprovalDate:      m.ApprovalDate,
 		ApprovedBy:        m.ApprovedBy,
@@ -42,10 +48,13 @@ func (m *Loan) ToEntity() *loan.Loan {
 	}
 }
 
-func FromEntity(l *loan.Loan) *Loan {
+func LoanFromEntity(l *loan.Loan) *Loan {
 	return &Loan{
 		ID:                l.ID,
+		BorrowerID:        l.BorrowerID,
 		Amount:            l.Amount,
+		Rate:              l.Rate,
+		ROI:               l.ROI,
 		Status:            string(l.Status),
 		ApprovalDate:      l.ApprovalDate,
 		ApprovedBy:        l.ApprovedBy,
@@ -58,10 +67,13 @@ func FromEntity(l *loan.Loan) *Loan {
 	}
 }
 
-func (m *Loan) ToDomain() *loan.Loan {
+func (m *Loan) LoanToDomain() *loan.Loan {
 	return &loan.Loan{
 		ID:                m.ID,
+		BorrowerID:        m.BorrowerID,
 		Amount:            m.Amount,
+		Rate:              m.Rate,
+		ROI:               m.ROI,
 		Status:            loan.Status(m.Status),
 		CreatedAt:         m.CreatedAt,
 		UpdatedAt:         m.UpdatedAt,

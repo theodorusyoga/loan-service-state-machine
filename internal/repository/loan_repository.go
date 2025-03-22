@@ -29,11 +29,11 @@ func (r *LoanRepository) Get(ctx context.Context, id string) (*loan.Loan, error)
 		return nil, err
 	}
 
-	return loanModel.ToDomain(), nil
+	return loanModel.LoanToDomain(), nil
 }
 
 func (r *LoanRepository) Create(ctx context.Context, loanEntity *loan.Loan) error {
-	loanModel := model.FromEntity(loanEntity)
+	loanModel := model.LoanFromEntity(loanEntity)
 
 	// Use CockroachDB transaction retry logic
 	return r.executeWithRetry(func(tx *gorm.DB) error {
@@ -42,7 +42,7 @@ func (r *LoanRepository) Create(ctx context.Context, loanEntity *loan.Loan) erro
 }
 
 func (r *LoanRepository) Save(ctx context.Context, loanEntity *loan.Loan) error {
-	loanModel := model.FromEntity(loanEntity)
+	loanModel := model.LoanFromEntity(loanEntity)
 
 	// Use CockroachDB transaction retry logic
 	return r.executeWithRetry(func(tx *gorm.DB) error {

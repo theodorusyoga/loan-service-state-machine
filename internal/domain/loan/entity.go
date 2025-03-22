@@ -1,6 +1,8 @@
 package loan
 
-import "time"
+import (
+	"time"
+)
 
 type Status string
 
@@ -23,24 +25,32 @@ type StatusTransition struct {
 
 type Loan struct {
 	ID                string
+	BorrowerID        string
 	Amount            float64
+	Rate              float64
+	ROI               float64
 	Status            Status
 	ApprovalDate      *time.Time
 	ApprovedBy        string
 	InvestmentDate    *time.Time
 	DisbursementDate  *time.Time
 	DisbursedBy       string
+	AgreementLetterID string
 	StatusTransitions []StatusTransition
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 }
 
-func NewLoan(id string, amount float64) *Loan {
+func NewLoan(id string, borrowerID string, amount float64, rate float64, roi float64) *Loan {
 	now := time.Now()
+
 	return &Loan{
-		ID:     id,
-		Amount: amount,
-		Status: StatusProposed,
+		ID:         id,
+		BorrowerID: borrowerID,
+		Amount:     amount,
+		Rate:       rate,
+		ROI:        roi,
+		Status:     StatusProposed,
 		StatusTransitions: []StatusTransition{
 			{
 				From:        "",
