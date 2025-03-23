@@ -42,7 +42,7 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 
 				loan.Status = Status(e.Dst)
 				loan.ApprovalDate = &now
-				loan.ApprovedBy = approvedBy
+				loan.ApprovedBy = &approvedBy
 				loan.UpdatedAt = now
 
 				loan.StatusTransitions = append(loan.StatusTransitions, StatusTransition{

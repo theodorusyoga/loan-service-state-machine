@@ -24,21 +24,22 @@ type StatusTransition struct {
 }
 
 type Loan struct {
-	ID                string
-	BorrowerID        string
-	Amount            float64
-	Rate              float64
-	ROI               float64
-	Status            Status
-	ApprovalDate      *time.Time
-	ApprovedBy        string
-	InvestmentDate    *time.Time
-	DisbursementDate  *time.Time
-	DisbursedBy       string
-	AgreementLetterID string
-	StatusTransitions []StatusTransition
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	ID                  string
+	BorrowerID          string
+	Amount              float64
+	Rate                float64
+	ROI                 float64
+	Status              Status
+	SurveyDocumentID    string
+	ApprovalDate        *time.Time
+	ApprovedBy          *string
+	InvestmentDate      *time.Time
+	DisbursementDate    *time.Time
+	DisbursedBy         *string
+	AgreementDocumentID string
+	StatusTransitions   []StatusTransition
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 }
 
 func NewLoan(id string, borrowerID string, amount float64, rate float64, roi float64) *Loan {

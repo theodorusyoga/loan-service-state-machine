@@ -23,7 +23,13 @@ func InitDB() *gorm.DB {
 func Migrate(db *gorm.DB) error {
 	log.Println("Running migrations")
 
-	err := db.AutoMigrate(&migrations_models.Loan{}, &migrations_models.Borrower{}, &migrations_models.AgreementLetter{})
+	err := db.AutoMigrate(
+		&migrations_models.Borrower{},
+		&migrations_models.Employee{},
+		&migrations_models.Lender{},
+		&migrations_models.Loan{},
+		&migrations_models.Document{},
+		&migrations_models.LoanLender{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}

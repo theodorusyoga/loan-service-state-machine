@@ -2,11 +2,13 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
+pre_cmd = ["lsof -ti:5002 | xargs kill -9 2>/dev/null || true"]
+stop_cmd = ["lsof -ti:5002 | xargs kill -9 2>/dev/null || true"]
 # Just plain old shell command. You could use `make` as well.
 cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ./cmd/api"
 # Binary file yields from `cmd`.
 bin = "tmp/main"
-full_bin = "dlv exec --accept-multiclient --api-version=2 --headless --listen=:2345 ./tmp/main"
+# full_bin = "dlv exec --accept-multiclient --api-version=2 --headless --listen=:2345 ./tmp/main"
 # Watch these directories for changes
 include_dir = ["cmd", "internal", "pkg"]
 # Exclude files or directories
@@ -23,6 +25,8 @@ poll = false
 poll_interval = 500
 # It's not necessary to trigger rebuild each time file changes if it's too frequent.
 delay = 1000 # ms
+stop_on_error = true
+send_interrupt = true
 
 [log]
 # Show log time

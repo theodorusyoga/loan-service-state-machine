@@ -47,6 +47,7 @@ var Module = fx.Options(
 var DomainModule = fx.Module("domain", fx.Provide(
 	loan.NewDefaultStatusValidator,
 	loan.NewLoanService,
+	borrower.NewBorrowerService,
 ))
 
 var InfrastructureModule = fx.Module("infrastructure",
@@ -73,16 +74,20 @@ var InfrastructureModule = fx.Module("infrastructure",
 var APIModule = fx.Module("api", fx.Provide(
 	ProvideValidator,
 	handler.NewLoanHandler,
+	handler.NewBorrowerHandler,
 	NewServer,
 ),
 	fx.Invoke(registerRoutes))
 
-func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler) {
+func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler, borrowerHandler *handler.BorrowerHandler) {
 	api := e.Group("/api/v1")
 
 	loans := api.Group("/loans")
 	loans.POST("", loanHandler.CreateLoan)
 	loans.POST("/:id/approve", loanHandler.ApproveLoan)
+
+	borrowers := api.Group("/borrowers")
+	borrowers.POST("", borrowerHandler.CreateBorrower)
 
 	// Start server in a goroutine
 	lc.Append(fx.Hook{

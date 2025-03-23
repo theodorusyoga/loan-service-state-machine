@@ -39,11 +39,9 @@ func (v *DefaultStatusValidator) isValidTransition(from, to Status) bool {
 
 // Validate if loan can be approved
 func (v *DefaultStatusValidator) validateApproval(loan *Loan) error {
-	if loan.ApprovedBy == "" {
+	if loan.ApprovedBy == nil {
 		return errors.New("approvedBy is required")
 	}
-
-	// TODO: Add more validation rules?? 😌
 
 	return nil
 }

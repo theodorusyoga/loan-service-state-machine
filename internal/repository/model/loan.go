@@ -18,10 +18,10 @@ type Loan struct {
 	ROI               float64
 	Status            string `gorm:"index;type:varchar(20)"`
 	ApprovalDate      *time.Time
-	ApprovedBy        string
+	ApprovedBy        *string
 	InvestmentDate    *time.Time
 	DisbursementDate  *time.Time
-	DisbursedBy       string
+	DisbursedBy       *string
 	StatusTransitions JSON      `gorm:"type:jsonb"` // Store as JSONB for CockroachDB
 	CreatedAt         time.Time `gorm:"index"`
 	UpdatedAt         time.Time
