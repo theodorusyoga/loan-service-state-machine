@@ -12,6 +12,7 @@ type Repository interface {
 	// TODO: Implement the following methods
 	List(ctx context.Context, filter EmployeeFilter) ([]*Employee, error)
 	// Delete(ctx context.Context, id string) error
+	Count(ctx context.Context, filter EmployeeFilter) (int64, error)
 }
 
 type EmployeeFilter struct {
@@ -21,4 +22,14 @@ type EmployeeFilter struct {
 	IDNumber    *string
 	Page        int
 	PageSize    int
+}
+
+func (f *EmployeeFilter) WithDefaults() *EmployeeFilter {
+	if f.Page <= 0 {
+		f.Page = 1
+	}
+	if f.PageSize <= 0 {
+		f.PageSize = 10
+	}
+	return f
 }

@@ -63,5 +63,5 @@ func (h *BorrowerHandler) ListBorrowers(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, response.Success(borrowers, "Borrowers retrieved successfully"))
+	return c.JSON(http.StatusOK, borrowers)
 }

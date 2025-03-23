@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain"
 	borrower "github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
 )
 
@@ -44,4 +45,38 @@ func (s *LoanService) CreateLoan(ctx context.Context, borrowerID string, amount 
 	}
 
 	return loan, nil
+}
+
+func (s *LoanService) GetByID(ctx context.Context, id string) (*Loan, error) {
+	return s.repository.Get(ctx, id)
+}
+
+func (s *LoanService) ListLoans(ctx context.Context, filter LoanFilter) (*domain.PaginatedResponse, error) {
+	filter.WithDefaults()
+	loans, err := s.repository.List(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the total count
+	totalItems, err := s.repository.Count(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Calculate total pages
+	totalPages := 0
+	if filter.PageSize > 0 {
+		totalPages = int((totalItems + int64(filter.PageSize) - 1) / int64(filter.PageSize))
+	}
+
+	return &domain.PaginatedResponse{
+		Data: loans,
+		Pagination: domain.PaginationInfo{
+			CurrentPage: filter.Page,
+			PageSize:    filter.PageSize,
+			TotalItems:  totalItems,
+			TotalPages:  totalPages,
+		},
+	}, nil
 }

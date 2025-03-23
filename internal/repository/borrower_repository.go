@@ -49,8 +49,33 @@ func (r *BorrowerRepository) Save(ctx context.Context, borrowerEntity *borrower.
 	})
 }
 
+func (r *BorrowerRepository) Count(ctx context.Context, filter borrower.BorrowerFilter) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&model.Borrower{})
+
+	if filter.FullName != nil && *filter.FullName != "" {
+		query = query.Where("full_name = ?", *filter.FullName)
+	}
+	if filter.Email != nil && *filter.Email != "" {
+		query = query.Where("email = ?", *filter.Email)
+	}
+	if filter.PhoneNumber != nil && *filter.PhoneNumber != "" {
+		query = query.Where("phone_number = ?", *filter.PhoneNumber)
+	}
+	if filter.IDNumber != nil && *filter.IDNumber != "" {
+		query = query.Where("id_number = ?", *filter.IDNumber)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (r *BorrowerRepository) List(ctx context.Context, filter borrower.BorrowerFilter) ([]*borrower.Borrower, error) {
 	var borrowerModels []*model.Borrower
+
 	query := r.db.WithContext(ctx)
 
 	if filter.FullName != nil && *filter.FullName != "" {

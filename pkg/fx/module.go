@@ -90,6 +90,7 @@ func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandl
 	api := e.Group("/api/v1")
 
 	loans := api.Group("/loans")
+	loans.GET("", loanHandler.ListLoans)
 	loans.POST("", loanHandler.CreateLoan)
 	loans.POST("/:id/approve", loanHandler.ApproveLoan)
 

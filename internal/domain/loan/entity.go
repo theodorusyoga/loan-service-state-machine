@@ -16,30 +16,30 @@ const (
 
 // To mark the history of the status transition
 type StatusTransition struct {
-	From        Status
-	To          Status
-	Date        time.Time
-	Description string
-	PerformedBy string
+	From        Status    `json:"from"`
+	To          Status    `json:"to"`
+	Date        time.Time `json:"date"`
+	Description string    `json:"description"`
+	PerformedBy string    `json:"performed_by"`
 }
 
 type Loan struct {
-	ID                  string
-	BorrowerID          string
-	Amount              float64
-	Rate                float64
-	ROI                 float64
-	Status              Status
-	SurveyDocumentID    string
-	ApprovalDate        *time.Time
-	ApprovedBy          *string
-	InvestmentDate      *time.Time
-	DisbursementDate    *time.Time
-	DisbursedBy         *string
-	AgreementDocumentID string
-	StatusTransitions   []StatusTransition
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
+	ID                  string             `json:"id"`
+	BorrowerID          string             `json:"borrower_id"`
+	Amount              float64            `json:"amount"`
+	Rate                float64            `json:"rate"`
+	ROI                 float64            `json:"roi"`
+	Status              Status             `json:"status"`
+	SurveyDocumentID    string             `json:"survey_document_id"`
+	ApprovalDate        *time.Time         `json:"approval_date"`
+	ApprovedBy          *string            `json:"approved_by"`
+	InvestmentDate      *time.Time         `json:"investment_date"`
+	DisbursementDate    *time.Time         `json:"disbursement_date"`
+	DisbursedBy         *string            `json:"disbursed_by"`
+	AgreementDocumentID string             `json:"agreement_document_id"`
+	StatusTransitions   []StatusTransition `json:"status_transitions"`
+	CreatedAt           time.Time          `json:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at"`
 }
 
 func NewLoan(id string, borrowerID string, amount float64, rate float64, roi float64) *Loan {

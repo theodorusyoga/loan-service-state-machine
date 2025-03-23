@@ -63,5 +63,5 @@ func (h *EmployeeHandler) ListEmployees(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, response.Success(employees, "Employees retrieved successfully"))
+	return c.JSON(http.StatusOK, employees)
 }

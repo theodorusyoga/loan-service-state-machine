@@ -50,6 +50,49 @@ func (r *LoanRepository) Save(ctx context.Context, loanEntity *loan.Loan) error 
 	})
 }
 
+func (r *LoanRepository) Count(ctx context.Context, filter loan.LoanFilter) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&model.Loan{})
+
+	if filter.MaxAmount != nil && *filter.MaxAmount != 0 {
+		query = query.Where("amount < ?", *filter.MaxAmount)
+	}
+
+	if filter.MinAmount != nil && *filter.MinAmount != 0 {
+		query = query.Where("amount > ?", *filter.MinAmount)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (r *LoanRepository) List(ctx context.Context, filter loan.LoanFilter) ([]*loan.Loan, error) {
+	var loanModels []*model.Loan
+	query := r.db.WithContext(ctx).Model(&model.Loan{})
+
+	if filter.MaxAmount != nil && *filter.MaxAmount != 0 {
+		query = query.Where("amount < ?", *filter.MaxAmount)
+	}
+
+	if filter.MinAmount != nil && *filter.MinAmount != 0 {
+		query = query.Where("amount > ?", *filter.MinAmount)
+	}
+
+	if err := query.Find(&loanModels).Error; err != nil {
+		return nil, err
+	}
+
+	var loans []*loan.Loan
+	for _, loanModel := range loanModels {
+		loans = append(loans, loanModel.LoanToDomain())
+	}
+
+	return loans, nil
+}
+
 /* Helper methods. DO NOT MODIFY THIS, this code is generated from CockroachDB */
 
 func (r *LoanRepository) executeWithRetry(operation func(tx *gorm.DB) error) error {

@@ -2,6 +2,8 @@ package employee
 
 import (
 	"context"
+
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain"
 )
 
 // Service provides employee business operations
@@ -35,6 +37,32 @@ func (s *EmployeeService) GetByID(ctx context.Context, id string) (*Employee, er
 	return s.repository.Get(ctx, id)
 }
 
-func (s *EmployeeService) ListEmployees(ctx context.Context, filter EmployeeFilter) ([]*Employee, error) {
-	return s.repository.List(ctx, filter)
+func (s *EmployeeService) ListEmployees(ctx context.Context, filter EmployeeFilter) (*domain.PaginatedResponse, error) {
+	filter.WithDefaults()
+	employees, err := s.repository.List(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the total count
+	totalItems, err := s.repository.Count(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Calculate total pages
+	totalPages := 0
+	if filter.PageSize > 0 {
+		totalPages = int((totalItems + int64(filter.PageSize) - 1) / int64(filter.PageSize))
+	}
+
+	return &domain.PaginatedResponse{
+		Data: employees,
+		Pagination: domain.PaginationInfo{
+			CurrentPage: filter.Page,
+			PageSize:    filter.PageSize,
+			TotalItems:  totalItems,
+			TotalPages:  totalPages,
+		},
+	}, nil
 }

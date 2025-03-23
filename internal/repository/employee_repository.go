@@ -49,6 +49,32 @@ func (r *EmployeeRepository) Save(ctx context.Context, employeeEntity *employee.
 	})
 }
 
+func (r *EmployeeRepository) Count(ctx context.Context, filter employee.EmployeeFilter) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&model.Employee{})
+
+	if filter.FullName != nil && *filter.FullName != "" {
+		query = query.Where("full_name = ?", *filter.FullName)
+	}
+	if filter.Email != nil && *filter.Email != "" {
+		query = query.Where("email = ?", *filter.Email)
+	}
+
+	if filter.PhoneNumber != nil && *filter.PhoneNumber != "" {
+		query = query.Where("phone_number = ?", *filter.PhoneNumber)
+	}
+
+	if filter.IDNumber != nil && *filter.IDNumber != "" {
+		query = query.Where("id_number = ?", *filter.IDNumber)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (r *EmployeeRepository) List(ctx context.Context, filter employee.EmployeeFilter) ([]*employee.Employee, error) {
 	var employeeModels []*model.Employee
 	query := r.db.WithContext(ctx)

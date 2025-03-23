@@ -8,13 +8,13 @@ import (
 
 // Employee represents a domain entity for an employee
 type Employee struct {
-	ID          string
-	FullName    string
-	Email       string
-	PhoneNumber string
-	IDNumber    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          string    `json:"id"`
+	FullName    string    `json:"full_name"`
+	Email       string    `json:"email"`
+	PhoneNumber string    `json:"phone_number"`
+	IDNumber    string    `json:"id_number"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func NewEmployee(fullName, email, phoneNumber, idNumber string) *Employee {

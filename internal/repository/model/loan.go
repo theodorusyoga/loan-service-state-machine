@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
@@ -27,9 +28,12 @@ type Loan struct {
 	UpdatedAt         time.Time
 }
 
-type JSON []loan.StatusTransition
-
 func (m *Loan) LoanToEntity() *loan.Loan {
+	var transitions []loan.StatusTransition
+	if len(m.StatusTransitions) > 0 {
+		_ = json.Unmarshal(m.StatusTransitions, &transitions)
+	}
+
 	return &loan.Loan{
 		ID:                m.ID,
 		BorrowerID:        m.BorrowerID,
@@ -42,13 +46,18 @@ func (m *Loan) LoanToEntity() *loan.Loan {
 		InvestmentDate:    m.InvestmentDate,
 		DisbursementDate:  m.DisbursementDate,
 		DisbursedBy:       m.DisbursedBy,
-		StatusTransitions: []loan.StatusTransition(m.StatusTransitions),
+		StatusTransitions: transitions,
 		CreatedAt:         m.CreatedAt,
 		UpdatedAt:         m.UpdatedAt,
 	}
 }
 
 func LoanFromEntity(l *loan.Loan) *Loan {
+	json, err := json.Marshal(l.StatusTransitions)
+	if err != nil {
+		return nil
+	}
+
 	return &Loan{
 		ID:                l.ID,
 		BorrowerID:        l.BorrowerID,
@@ -61,13 +70,18 @@ func LoanFromEntity(l *loan.Loan) *Loan {
 		InvestmentDate:    l.InvestmentDate,
 		DisbursementDate:  l.DisbursementDate,
 		DisbursedBy:       l.DisbursedBy,
-		StatusTransitions: JSON(l.StatusTransitions),
+		StatusTransitions: json,
 		CreatedAt:         l.CreatedAt,
 		UpdatedAt:         l.UpdatedAt,
 	}
 }
 
 func (m *Loan) LoanToDomain() *loan.Loan {
+	var transitions []loan.StatusTransition
+	if len(m.StatusTransitions) > 0 {
+		_ = json.Unmarshal(m.StatusTransitions, &transitions)
+	}
+
 	return &loan.Loan{
 		ID:                m.ID,
 		BorrowerID:        m.BorrowerID,
@@ -81,6 +95,6 @@ func (m *Loan) LoanToDomain() *loan.Loan {
 		ApprovedBy:        m.ApprovedBy,
 		InvestmentDate:    m.InvestmentDate,
 		DisbursementDate:  m.DisbursementDate,
-		StatusTransitions: m.StatusTransitions,
+		StatusTransitions: transitions,
 	}
 }

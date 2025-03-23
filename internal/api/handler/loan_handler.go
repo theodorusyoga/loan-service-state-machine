@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -20,6 +21,40 @@ func NewLoanHandler(loanService *loan.LoanService, validate *validator.Validate)
 		loanService: loanService,
 		validate:    validate,
 	}
+}
+
+func (h *LoanHandler) ListLoans(c echo.Context) error {
+	// Extract query parameters for filtering
+	maxAmountStr := c.QueryParam("max_amount")
+	minAmountStr := c.QueryParam("min_amount")
+
+	var maxAmount, minAmount *float64
+
+	if maxAmountStr != "" {
+		val, err := strconv.ParseFloat(maxAmountStr, 64)
+		if err == nil {
+			maxAmount = &val
+		}
+	}
+
+	if minAmountStr != "" {
+		val, err := strconv.ParseFloat(minAmountStr, 64)
+		if err == nil {
+			minAmount = &val
+		}
+	}
+
+	filter := loan.LoanFilter{
+		MaxAmount: maxAmount,
+		MinAmount: minAmount,
+	}
+
+	borrowers, err := h.loanService.ListLoans(c.Request().Context(), filter)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, response.Error(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, borrowers)
 }
 
 func (h *LoanHandler) CreateLoan(c echo.Context) error {
