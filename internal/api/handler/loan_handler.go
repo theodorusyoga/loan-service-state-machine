@@ -79,25 +79,48 @@ func (h *LoanHandler) CreateLoan(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Success(loan, "Loan created successfully"))
 }
 
-func (h *LoanHandler) ApproveLoan(c echo.Context) error {
-	id := c.Param("id")
+func (h *LoanHandler) UpdateLoanStatus(c echo.Context) error {
+	loanID := c.Param("id")
+	newStatus := c.Param("status")
 
-	var req request.ApprovalRequest
+	// Validate the requested status
+	if !loan.IsValidStatus(newStatus) {
+		return c.JSON(http.StatusBadRequest, response.Error("invalid status"))
+	}
+
+	var req request.StatusUpdateRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, response.Error("Invalid request"))
+		return c.JSON(http.StatusBadRequest, response.Error("invalid request"))
 	}
 
-	loan := &loan.Loan{
-		ID:     id,
-		Status: loan.StatusProposed,
+	// Get loan with ID
+	loanEntity, entityErr := h.loanService.GetByID(c.Request().Context(), loanID)
+	if entityErr != nil {
+		return c.JSON(http.StatusBadRequest, response.Error(entityErr.Error()))
 	}
 
-	err := h.loanService.ApproveLoan(loan, req.ApprovedBy)
+	var err error
+
+	// Handle different status transitions
+	switch newStatus {
+	case string(loan.EventApprove):
+		err = h.loanService.ApproveLoan(loanEntity, req.ApprovalEmployeeID, req.DocumentID)
+	// TODO: Complete the statuses
+	// case "reject":
+	// 	err = h.loanService.RejectLoan(loan, req.UpdatedBy)
+	// case "disburse":
+	// 	err = h.loanService.DisburseLoan(loan, req.UpdatedBy)
+	// case "complete":
+	// 	err = h.loanService.CompleteLoan(loan, req.UpdatedBy)
+	default:
+		return c.JSON(http.StatusBadRequest, response.Error("Unsupported status transition"))
+	}
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, response.Success("Loan approved successfully"))
+	return c.JSON(http.StatusOK, response.Success("Loan status updated successfully"))
 }
 
 func formatValidationErrors(errors validator.ValidationErrors) string {

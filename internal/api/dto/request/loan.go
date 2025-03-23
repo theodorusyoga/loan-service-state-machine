@@ -11,3 +11,9 @@ type CreateLoanRequest struct {
 type ApprovalRequest struct {
 	ApprovedBy string `json:"approvedBy" validate:"required"`
 }
+
+type StatusUpdateRequest struct {
+	ApprovalEmployeeID string `json:"approval_employee_id" validate:"required"`
+	ApprovalDate       string `json:"approval_date" validate:"required"`
+	DocumentID         string `json:"document_id" validate:"required"`
+}

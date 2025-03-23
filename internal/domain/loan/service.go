@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain"
 	borrower "github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
 )
 
 // Service provides loan business operations
@@ -19,13 +21,17 @@ type Service interface {
 type LoanService struct {
 	repository         Repository
 	borrowerRepository borrower.Repository
+	employeeRepository employee.Repository
+	documentRepository document.Repository
 	validator          DefaultStatusValidator
 }
 
-func NewLoanService(r Repository, b borrower.Repository) *LoanService {
+func NewLoanService(r Repository, b borrower.Repository, d document.Repository, e employee.Repository) *LoanService {
 	return &LoanService{
 		repository:         r,
 		borrowerRepository: b,
+		documentRepository: d,
+		employeeRepository: e,
 		validator:          *NewDefaultStatusValidator(),
 	}
 }
@@ -79,4 +85,8 @@ func (s *LoanService) ListLoans(ctx context.Context, filter LoanFilter) (*domain
 			TotalPages:  totalPages,
 		},
 	}, nil
+}
+
+func (s *LoanService) Save(ctx context.Context, loan *Loan) error {
+	return s.repository.Save(ctx, loan)
 }

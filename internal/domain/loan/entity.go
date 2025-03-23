@@ -36,7 +36,7 @@ type Loan struct {
 	InvestmentDate      *time.Time         `json:"investment_date"`
 	DisbursementDate    *time.Time         `json:"disbursement_date"`
 	DisbursedBy         *string            `json:"disbursed_by"`
-	AgreementDocumentID string             `json:"agreement_document_id"`
+	AgreementDocumentID *string            `json:"agreement_document_id"`
 	StatusTransitions   []StatusTransition `json:"status_transitions"`
 	CreatedAt           time.Time          `json:"created_at"`
 	UpdatedAt           time.Time          `json:"updated_at"`

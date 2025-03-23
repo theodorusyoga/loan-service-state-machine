@@ -10,6 +10,7 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/config"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/handler"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/repository"
@@ -50,6 +51,7 @@ var DomainModule = fx.Module("domain", fx.Provide(
 	loan.NewLoanService,
 	borrower.NewBorrowerService,
 	employee.NewEmployeeService,
+	document.NewDocumentService,
 ))
 
 var InfrastructureModule = fx.Module("infrastructure",
@@ -74,6 +76,10 @@ var InfrastructureModule = fx.Module("infrastructure",
 			repository.NewEmployeeRepository,
 			fx.As(new(employee.Repository)),
 		),
+		fx.Annotate(
+			repository.NewDocumentRepository,
+			fx.As(new(document.Repository)),
+		),
 	),
 )
 
@@ -92,7 +98,7 @@ func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandl
 	loans := api.Group("/loans")
 	loans.GET("", loanHandler.ListLoans)
 	loans.POST("", loanHandler.CreateLoan)
-	loans.POST("/:id/approve", loanHandler.ApproveLoan)
+	loans.PATCH("/:id/:status", loanHandler.UpdateLoanStatus)
 
 	borrowers := api.Group("/borrowers")
 	borrowers.GET("", borrowerHandler.ListBorrowers)
