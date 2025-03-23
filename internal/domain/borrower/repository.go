@@ -10,7 +10,7 @@ type Repository interface {
 	Save(ctx context.Context, borrower *Borrower) error
 	Create(ctx context.Context, borrower *Borrower) error
 	// TODO: Implement the following methods
-	// List(ctx context.Context, filter BorrowerFilter) ([]*Borrower, error)
+	List(ctx context.Context, filter BorrowerFilter) ([]*Borrower, error)
 	// Delete(ctx context.Context, id string) error
 }
 

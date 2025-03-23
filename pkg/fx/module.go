@@ -10,6 +10,7 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/config"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/handler"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/repository"
 	"go.uber.org/fx"
@@ -48,6 +49,7 @@ var DomainModule = fx.Module("domain", fx.Provide(
 	loan.NewDefaultStatusValidator,
 	loan.NewLoanService,
 	borrower.NewBorrowerService,
+	employee.NewEmployeeService,
 ))
 
 var InfrastructureModule = fx.Module("infrastructure",
@@ -68,6 +70,10 @@ var InfrastructureModule = fx.Module("infrastructure",
 			repository.NewBorrowerRepository,
 			fx.As(new(borrower.Repository)),
 		),
+		fx.Annotate(
+			repository.NewEmployeeRepository,
+			fx.As(new(employee.Repository)),
+		),
 	),
 )
 
@@ -75,11 +81,12 @@ var APIModule = fx.Module("api", fx.Provide(
 	ProvideValidator,
 	handler.NewLoanHandler,
 	handler.NewBorrowerHandler,
+	handler.NewEmployeeHandler,
 	NewServer,
 ),
 	fx.Invoke(registerRoutes))
 
-func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler, borrowerHandler *handler.BorrowerHandler) {
+func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler, borrowerHandler *handler.BorrowerHandler, emp *handler.EmployeeHandler) {
 	api := e.Group("/api/v1")
 
 	loans := api.Group("/loans")
@@ -87,7 +94,12 @@ func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandl
 	loans.POST("/:id/approve", loanHandler.ApproveLoan)
 
 	borrowers := api.Group("/borrowers")
+	borrowers.GET("", borrowerHandler.ListBorrowers)
 	borrowers.POST("", borrowerHandler.CreateBorrower)
+
+	employees := api.Group("/employees")
+	employees.GET("", emp.ListEmployees)
+	employees.POST("", emp.CreateEmployee)
 
 	// Start server in a goroutine
 	lc.Append(fx.Hook{

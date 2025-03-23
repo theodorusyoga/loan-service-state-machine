@@ -33,3 +33,7 @@ func (s *BorrowerService) CreateBorrower(ctx context.Context, fullName, email, p
 func (s *BorrowerService) GetByID(ctx context.Context, id string) (*Borrower, error) {
 	return s.repository.Get(ctx, id)
 }
+
+func (s *BorrowerService) ListBorrowers(ctx context.Context, filter BorrowerFilter) ([]*Borrower, error) {
+	return s.repository.List(ctx, filter)
+}

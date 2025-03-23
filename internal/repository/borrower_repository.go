@@ -49,6 +49,39 @@ func (r *BorrowerRepository) Save(ctx context.Context, borrowerEntity *borrower.
 	})
 }
 
+func (r *BorrowerRepository) List(ctx context.Context, filter borrower.BorrowerFilter) ([]*borrower.Borrower, error) {
+	var borrowerModels []*model.Borrower
+	query := r.db.WithContext(ctx)
+
+	if filter.FullName != nil && *filter.FullName != "" {
+		query = query.Where("full_name = ?", *filter.FullName)
+	}
+	if filter.Email != nil && *filter.Email != "" {
+		query = query.Where("email = ?", *filter.Email)
+	}
+	if filter.PhoneNumber != nil && *filter.PhoneNumber != "" {
+		query = query.Where("phone_number = ?", *filter.PhoneNumber)
+	}
+	if filter.IDNumber != nil && *filter.IDNumber != "" {
+		query = query.Where("id_number = ?", *filter.IDNumber)
+	}
+
+	if filter.Page > 0 && filter.PageSize > 0 {
+		query = query.Offset((filter.Page - 1) * filter.PageSize).Limit(filter.PageSize)
+	}
+
+	if err := query.Find(&borrowerModels).Error; err != nil {
+		return nil, err
+	}
+
+	var borrowers []*borrower.Borrower
+	for _, borrowerModel := range borrowerModels {
+		borrowers = append(borrowers, borrowerModel.BorrowerToDomain())
+	}
+
+	return borrowers, nil
+}
+
 /* Helper methods. DO NOT MODIFY THIS, this code is generated from CockroachDB */
 
 func (r *BorrowerRepository) executeWithRetry(operation func(tx *gorm.DB) error) error {
