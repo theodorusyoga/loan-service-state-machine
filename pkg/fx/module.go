@@ -12,6 +12,7 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan/callbacks"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/repository"
@@ -53,6 +54,7 @@ var DomainModule = fx.Module("domain", fx.Provide(
 	borrower.NewBorrowerService,
 	employee.NewEmployeeService,
 	document.NewDocumentService,
+	lender.NewLenderService,
 
 	// Callback registrar for FSM
 	fx.Annotate(
@@ -87,6 +89,10 @@ var InfrastructureModule = fx.Module("infrastructure",
 			repository.NewDocumentRepository,
 			fx.As(new(document.Repository)),
 		),
+		fx.Annotate(
+			repository.NewLenderRepository,
+			fx.As(new(lender.Repository)),
+		),
 	),
 )
 
@@ -95,11 +101,15 @@ var APIModule = fx.Module("api", fx.Provide(
 	handler.NewLoanHandler,
 	handler.NewBorrowerHandler,
 	handler.NewEmployeeHandler,
+	handler.NewLenderHandler,
 	NewServer,
 ),
 	fx.Invoke(registerRoutes))
 
-func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler, borrowerHandler *handler.BorrowerHandler, emp *handler.EmployeeHandler) {
+func registerRoutes(lc fx.Lifecycle,
+	e *echo.Echo, cfg *config.Config, loanHandler *handler.LoanHandler,
+	borrowerHandler *handler.BorrowerHandler, emp *handler.EmployeeHandler,
+	lenderHandler *handler.LenderHandler) {
 	api := e.Group("/api/v1")
 
 	loans := api.Group("/loans")
@@ -114,6 +124,10 @@ func registerRoutes(lc fx.Lifecycle, e *echo.Echo, cfg *config.Config, loanHandl
 	employees := api.Group("/employees")
 	employees.GET("", emp.ListEmployees)
 	employees.POST("", emp.CreateEmployee)
+
+	lenders := api.Group("/lenders")
+	lenders.GET("", lenderHandler.ListLenders)
+	lenders.POST("", lenderHandler.CreateLender)
 
 	// Start server in a goroutine
 	lc.Append(fx.Hook{
