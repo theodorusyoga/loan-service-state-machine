@@ -24,15 +24,17 @@ type LoanService struct {
 	employeeRepository employee.Repository
 	documentRepository document.Repository
 	validator          DefaultStatusValidator
+	callbackRegistrar  CallbackRegistrar
 }
 
-func NewLoanService(r Repository, b borrower.Repository, d document.Repository, e employee.Repository) *LoanService {
+func NewLoanService(r Repository, b borrower.Repository, d document.Repository, e employee.Repository, c CallbackRegistrar) *LoanService {
 	return &LoanService{
 		repository:         r,
 		borrowerRepository: b,
 		documentRepository: d,
 		employeeRepository: e,
 		validator:          *NewDefaultStatusValidator(),
+		callbackRegistrar:  c,
 	}
 }
 
