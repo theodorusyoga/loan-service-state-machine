@@ -31,13 +31,21 @@ func (r *DocumentRepository) Get(ctx context.Context, id string) (*document.Docu
 	return documentModel.DocumentToDomain(), nil
 }
 
-func (r *DocumentRepository) Create(ctx context.Context, documentEntity *document.Document) error {
+func (r *DocumentRepository) Create(ctx context.Context, documentEntity *document.Document) (string, error) {
 	documentModel := model.DocumentFromEntity(documentEntity)
 
 	// Use CockroachDB transaction retry logic
-	return r.executeWithRetry(func(tx *gorm.DB) error {
+	err := r.executeWithRetry(func(tx *gorm.DB) error {
 		return tx.WithContext(ctx).Create(documentModel).Error
 	})
+
+	if err != nil {
+		return "", err
+	}
+
+	*documentEntity = *documentModel.DocumentToDomain()
+
+	return documentEntity.ID, nil
 }
 
 func (r *DocumentRepository) Save(ctx context.Context, documentEntity *document.Document) error {

@@ -8,7 +8,7 @@ import (
 type Repository interface {
 	Get(ctx context.Context, id string) (*Document, error)
 	Save(ctx context.Context, document *Document) error
-	Create(ctx context.Context, document *Document) error
+	Create(ctx context.Context, document *Document) (string, error)
 	// TODO: Implement the following methods
 	List(ctx context.Context, filter DocumentFilter) ([]*Document, error)
 	// Delete(ctx context.Context, id string) error

@@ -22,7 +22,10 @@ func NewLoanRepository(db *gorm.DB) *LoanRepository {
 
 func (r *LoanRepository) Get(ctx context.Context, id string) (*loan.Loan, error) {
 	var loanModel model.Loan
-	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&loanModel).Error; err != nil {
+	if err := r.db.WithContext(ctx).
+		Preload("SurveyDocument").
+		Preload("AgreementDocument").
+		Where("id = ?", id).First(&loanModel).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("loan not found")
 		}
@@ -72,6 +75,8 @@ func (r *LoanRepository) Count(ctx context.Context, filter loan.LoanFilter) (int
 func (r *LoanRepository) List(ctx context.Context, filter loan.LoanFilter) ([]*loan.Loan, error) {
 	var loanModels []*model.Loan
 	query := r.db.WithContext(ctx).Model(&model.Loan{})
+
+	query = query.Preload("SurveyDocument").Preload("AgreementDocument")
 
 	if filter.MaxAmount != nil && *filter.MaxAmount != 0 {
 		query = query.Where("amount < ?", *filter.MaxAmount)

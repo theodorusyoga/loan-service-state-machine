@@ -12,7 +12,6 @@ func (Document) TableName() string {
 
 type Document struct {
 	ID        string `gorm:"type:uuid;primary_key"`
-	LoanID    string `gorm:"type:uuid;uniqueIndex"`
 	FileName  string `gorm:"type:varchar(100)"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -21,7 +20,6 @@ type Document struct {
 func (m *Document) DocumentToEntity() *document.Document {
 	return &document.Document{
 		ID:        m.ID,
-		LoanID:    m.LoanID,
 		FileName:  m.FileName,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
@@ -31,7 +29,6 @@ func (m *Document) DocumentToEntity() *document.Document {
 func DocumentFromEntity(d *document.Document) *Document {
 	return &Document{
 		ID:        d.ID,
-		LoanID:    d.LoanID,
 		FileName:  d.FileName,
 		CreatedAt: d.CreatedAt,
 		UpdatedAt: d.UpdatedAt,
@@ -41,7 +38,6 @@ func DocumentFromEntity(d *document.Document) *Document {
 func (m *Document) DocumentToDomain() *document.Document {
 	return &document.Document{
 		ID:        m.ID,
-		LoanID:    m.LoanID,
 		FileName:  m.FileName,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

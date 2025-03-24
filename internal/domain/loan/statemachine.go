@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/looplab/fsm"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 )
 
 const (
@@ -47,11 +48,17 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 				// TODO: Check document completeness
 				loan := e.Args[0].(*Loan)
 				approvedBy := e.Args[1].(string)
-				// validate document ID exists
-				documentID := e.Args[2].(string)
+				fileName := e.Args[2].(string)
 
-				loan.ApprovedBy = &approvedBy
-				loan.SurveyDocumentID = documentID
+				if fileName == "" {
+					e.Cancel(errors.New("document is required"))
+					return
+				}
+
+				if approvedBy == "" {
+					e.Cancel(errors.New("approved by is required"))
+					return
+				}
 
 				// validate transition
 				err := s.validator.Validate(loan, Status(e.Src), Status(e.Dst))
@@ -67,13 +74,6 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 					return
 				}
 
-				// check document exists in DB
-				_, err = s.documentRepository.Get(context.Background(), documentID)
-				if err != nil {
-					e.Cancel(errors.New("document not found"))
-					return
-				}
-
 			},
 			"after_" + EventApprove: func(_ context.Context, e *fsm.Event) {
 				loan := e.Args[0].(*Loan)
@@ -81,12 +81,21 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 				approvedBy := e.Args[1].(string)
 
 				// validate document ID exists
-				documentID := e.Args[2].(string)
+				fileName := e.Args[2].(string)
+
+				// insert document
+				doc := document.NewDocument(loan.ID, fileName)
+				// create document
+				docId, docErr := s.documentRepository.Create(context.Background(), doc)
+				if docErr != nil {
+					e.Cancel(errors.New("error creating document"))
+					return
+				}
 
 				loan.Status = Status(e.Dst)
 				loan.ApprovalDate = &now
 				loan.ApprovedBy = &approvedBy
-				loan.SurveyDocumentID = documentID
+				loan.SurveyDocumentID = &docId
 				loan.UpdatedAt = now
 
 				loan.StatusTransitions = append(loan.StatusTransitions, StatusTransition{
@@ -98,6 +107,7 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 				})
 
 				// update to DB
+				// TODO: Should be in transaction
 				err := s.repository.Save(context.Background(), loan)
 				if err != nil {
 					e.Cancel(errors.New("error updating loan status"))
@@ -109,9 +119,9 @@ func (s *LoanService) createFSM(loan *Loan) *fsm.FSM {
 	)
 }
 
-func (s *LoanService) ApproveLoan(loan *Loan, approvedBy string, documentID string) error {
+func (s *LoanService) ApproveLoan(loan *Loan, approvedBy string, fileName string) error {
 	loanFSM := s.createFSM(loan)
-	err := loanFSM.Event(context.Background(), EventApprove, loan, approvedBy, documentID)
+	err := loanFSM.Event(context.Background(), EventApprove, loan, approvedBy, fileName)
 	if err != nil {
 		if errors.Is(err, fsm.NoTransitionError{}) {
 			return errors.New("cannot approve loan in current state")

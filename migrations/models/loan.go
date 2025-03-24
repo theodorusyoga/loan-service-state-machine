@@ -15,12 +15,14 @@ type Loan struct {
 	ROI                 float64  `gorm:"type:decimal(5,2);not null"` // Return on Investment for investors
 	Status              string   `gorm:"index:idx_loan_status;type:varchar(20);not null"`
 	SurveyDocumentID    string   `gorm:"type:uuid;index:idx_survey_loan_document_id"`
+	SurveyDocument      Document `gorm:"foreignKey:SurveyDocumentID"`
 	ApprovalDate        *time.Time
 	ApprovedBy          string `gorm:"type:uuid;index;default:null"`
 	InvestmentDate      *time.Time
 	DisbursementDate    *time.Time
 	DisbursedBy         string       `gorm:"type:uuid;index;default:null"`
 	AgreementDocumentID string       `gorm:"type:uuid;index:idx_agreement_loan_document_id"`
+	AgreementDocument   Document     `gorm:"foreignKey:AgreementDocumentID"`
 	StatusTransitions   JSON         `gorm:"type:jsonb"`
 	LoanLenders         []LoanLender `gorm:"foreignKey:LoanID"`
 	CreatedAt           time.Time    `gorm:"index"`

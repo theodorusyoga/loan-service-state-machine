@@ -15,5 +15,5 @@ type ApprovalRequest struct {
 type StatusUpdateRequest struct {
 	ApprovalEmployeeID string `json:"approval_employee_id" validate:"required"`
 	ApprovalDate       string `json:"approval_date" validate:"required"`
-	DocumentID         string `json:"document_id" validate:"required"`
+	FileName           string `json:"file_name" validate:"required"`
 }

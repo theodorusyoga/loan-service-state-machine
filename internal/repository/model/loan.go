@@ -23,8 +23,10 @@ type Loan struct {
 	InvestmentDate      *time.Time
 	DisbursementDate    *time.Time
 	DisbursedBy         *string
-	SurveyDocumentID    string    `gorm:"type:uuid"`
+	SurveyDocumentID    *string   `gorm:"type:uuid"`
+	SurveyDocument      *Document `gorm:"foreignKey:ID;references:SurveyDocumentID"`
 	AgreementDocumentID *string   `gorm:"type:uuid"`
+	AgreementDocument   *Document `gorm:"foreignKey:ID;references:AgreementDocumentID"`
 	StatusTransitions   JSON      `gorm:"type:jsonb"` // Store as JSONB for CockroachDB
 	CreatedAt           time.Time `gorm:"index"`
 	UpdatedAt           time.Time
@@ -87,7 +89,7 @@ func (m *Loan) LoanToDomain() *loan.Loan {
 		_ = json.Unmarshal(m.StatusTransitions, &transitions)
 	}
 
-	return &loan.Loan{
+	domainLoan := &loan.Loan{
 		ID:                  m.ID,
 		BorrowerID:          m.BorrowerID,
 		Amount:              m.Amount,
@@ -104,4 +106,13 @@ func (m *Loan) LoanToDomain() *loan.Loan {
 		DisbursementDate:    m.DisbursementDate,
 		StatusTransitions:   transitions,
 	}
+
+	if m.SurveyDocument != nil {
+		domainLoan.SurveyDocument = m.SurveyDocument.DocumentToDomain()
+	}
+	if m.AgreementDocument != nil {
+		domainLoan.AgreementDocument = m.AgreementDocument.DocumentToDomain()
+	}
+
+	return domainLoan
 }

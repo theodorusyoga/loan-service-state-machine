@@ -2,6 +2,8 @@ package loan
 
 import (
 	"time"
+
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 )
 
 type Status string
@@ -30,13 +32,15 @@ type Loan struct {
 	Rate                float64            `json:"rate"`
 	ROI                 float64            `json:"roi"`
 	Status              Status             `json:"status"`
-	SurveyDocumentID    string             `json:"survey_document_id"`
+	SurveyDocumentID    *string            `json:"survey_document_id"`
+	SurveyDocument      *document.Document `json:"survey_document,omitempty"`
 	ApprovalDate        *time.Time         `json:"approval_date"`
 	ApprovedBy          *string            `json:"approved_by"`
 	InvestmentDate      *time.Time         `json:"investment_date"`
 	DisbursementDate    *time.Time         `json:"disbursement_date"`
 	DisbursedBy         *string            `json:"disbursed_by"`
 	AgreementDocumentID *string            `json:"agreement_document_id"`
+	AgreementDocument   *document.Document `json:"agreement_document,omitempty"`
 	StatusTransitions   []StatusTransition `json:"status_transitions"`
 	CreatedAt           time.Time          `json:"created_at"`
 	UpdatedAt           time.Time          `json:"updated_at"`

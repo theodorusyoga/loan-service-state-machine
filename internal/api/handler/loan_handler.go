@@ -104,7 +104,7 @@ func (h *LoanHandler) UpdateLoanStatus(c echo.Context) error {
 	// Handle different status transitions
 	switch newStatus {
 	case string(loan.EventApprove):
-		err = h.loanService.ApproveLoan(loanEntity, req.ApprovalEmployeeID, req.DocumentID)
+		err = h.loanService.ApproveLoan(loanEntity, req.ApprovalEmployeeID, req.FileName)
 	// TODO: Complete the statuses
 	// case "reject":
 	// 	err = h.loanService.RejectLoan(loan, req.UpdatedBy)

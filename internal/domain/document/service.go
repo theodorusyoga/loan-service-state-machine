@@ -19,7 +19,7 @@ func NewDocumentService(r Repository) *DocumentService {
 func (s *DocumentService) CreateDocument(ctx context.Context, loanID, fileName string) (*Document, error) {
 	document := NewDocument(loanID, fileName)
 
-	if err := s.repository.Create(ctx, document); err != nil {
+	if _, err := s.repository.Create(ctx, document); err != nil {
 		return nil, err
 	}
 
