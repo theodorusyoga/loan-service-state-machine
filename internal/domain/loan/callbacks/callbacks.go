@@ -5,26 +5,33 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
+	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
 )
 
 // CallbackProvider provides callback functions for the loan state machine
 type CallbackProvider struct {
-	LoanRepository     loan.Repository
-	EmployeeRepository employee.Repository
-	DocumentRepository document.Repository
-	Validator          loan.DefaultStatusValidator
+	LenderRepository     loanlender.Repository
+	LoanRepository       loan.Repository
+	LoanLenderRepository loanlender.Repository
+	EmployeeRepository   employee.Repository
+	DocumentRepository   document.Repository
+	Validator            loan.DefaultStatusValidator
 }
 
 func New(
+	lenderRepo loanlender.Repository,
 	loanRepo loan.Repository,
+	loanLenderRepo loanlender.Repository,
 	empRepo employee.Repository,
 	docRepo document.Repository,
 ) *CallbackProvider {
 	return &CallbackProvider{
-		LoanRepository:     loanRepo,
-		EmployeeRepository: empRepo,
-		DocumentRepository: docRepo,
-		Validator:          *loan.NewDefaultStatusValidator(),
+		LenderRepository:     lenderRepo,
+		LoanRepository:       loanRepo,
+		LoanLenderRepository: loanLenderRepo,
+		EmployeeRepository:   empRepo,
+		DocumentRepository:   docRepo,
+		Validator:            *loan.NewDefaultStatusValidator(),
 	}
 }
 
@@ -33,6 +40,9 @@ func (p *CallbackProvider) GetCallbacks() fsm.Callbacks {
 
 	// Add approve callbacks
 	p.registerApproveCallbacks(callbacks)
+
+	// Add invest callbacks
+	p.registerInvestCallbacks(callbacks)
 
 	// TODO: Add other callbacks
 

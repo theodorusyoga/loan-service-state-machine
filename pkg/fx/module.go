@@ -15,6 +15,7 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan/callbacks"
+	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/repository"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
@@ -55,6 +56,7 @@ var DomainModule = fx.Module("domain", fx.Provide(
 	employee.NewEmployeeService,
 	document.NewDocumentService,
 	lender.NewLenderService,
+	loanlender.NewLoanLenderService,
 
 	// Callback registrar for FSM
 	fx.Annotate(
@@ -92,6 +94,10 @@ var InfrastructureModule = fx.Module("infrastructure",
 		fx.Annotate(
 			repository.NewLenderRepository,
 			fx.As(new(lender.Repository)),
+		),
+		fx.Annotate(
+			repository.NewLoanLenderRepository,
+			fx.As(new(loanlender.Repository)),
 		),
 	),
 )
