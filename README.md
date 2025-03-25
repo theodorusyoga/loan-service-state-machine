@@ -2,11 +2,9 @@
 
 This project implements a loan service with state machine workflow management to handle the different stages of loan processing from application (proposed status) to disbursement.
 
-### Introduction Video
+## Introduction Video
 
-![video](https://drive.google.com/uc?export=view&id=1b1TFzZKkkFYHHHSqSYhSzYSl-GUvt8Q_)
-
-Or click the link here if the video doesn't show up:
+Click the link here to watch my introduction video:
 https://drive.google.com/file/d/1b1TFzZKkkFYHHHSqSYhSzYSl-GUvt8Q_/view?usp=sharing
 
 ### Tech Stack
