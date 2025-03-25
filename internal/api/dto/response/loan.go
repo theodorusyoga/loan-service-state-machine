@@ -24,6 +24,7 @@ type StatusTransitionDTO struct {
 }
 
 type LoanLenderResponse struct {
-	RemainingAmount float64 `json:"remainingAmount"`
-	InvestedAmount  float64 `json:"investedAmount"`
+	RemainingAmount   float64 `json:"remaining_amount"`
+	InvestedAmount    float64 `json:"invested_amount"`
+	AgreementDocument *string `json:"agreement_document"`
 }

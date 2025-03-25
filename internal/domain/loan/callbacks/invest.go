@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/looplab/fsm"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/dto/response"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
@@ -98,6 +99,8 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 
 	willBeFullyFunded := (currentInvestment + amount) == loanObj.Amount
 
+	var agreementDocLink *string
+
 	// Update status when fully funded only
 	if willBeFullyFunded {
 		loanObj.Status = loan.Status(e.Dst)
@@ -112,6 +115,20 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 			PerformedBy: lender.ID,
 		})
 
+		// Create agreement letter
+		document := &document.Document{
+			ID:       uuid.New().String(),
+			FileName: "agreement_" + loanObj.ID + ".pdf",
+		}
+		agreementDocID, err := p.DocumentRepository.Create(ctx, document)
+		if err != nil {
+			e.Cancel(errors.New("error creating agreement document: " + err.Error()))
+			return
+		}
+
+		loanObj.AgreementDocumentID = &agreementDocID
+		agreementDocLink = &document.FileName
+
 		// Update loan in DB
 		err = p.LoanRepository.Save(ctx, loanObj)
 		if err != nil {
@@ -122,8 +139,9 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 	if result, ok := ctx.Value(loan.InvestResultKey).(*response.LoanLenderResponse); ok {
 		// Copy values to the result pointer
 		*result = response.LoanLenderResponse{
-			RemainingAmount: loanObj.Amount - (currentInvestment + amount),
-			InvestedAmount:  currentInvestment + amount,
+			RemainingAmount:   loanObj.Amount - (currentInvestment + amount),
+			InvestedAmount:    currentInvestment + amount,
+			AgreementDocument: agreementDocLink,
 		}
 	}
 
