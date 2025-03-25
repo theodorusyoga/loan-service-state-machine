@@ -45,7 +45,8 @@ func (p *CallbackProvider) GetCallbacks() fsm.Callbacks {
 	// Add invest callbacks
 	p.registerInvestCallbacks(callbacks)
 
-	// TODO: Add other callbacks
+	// Add disburse callbacks
+	p.registerDisburseCallbacks(callbacks)
 
 	return callbacks
 }

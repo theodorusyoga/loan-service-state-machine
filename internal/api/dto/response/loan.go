@@ -28,3 +28,11 @@ type LoanLenderResponse struct {
 	InvestedAmount    float64 `json:"invested_amount"`
 	AgreementDocument *string `json:"agreement_document"`
 }
+
+type DisbursementResponse struct {
+	DisbursementDate  time.Time `json:"disbursement_date"`
+	DisbursedBy       string    `json:"disbursed_by"`
+	AgreementDocument *string   `json:"agreement_document"`
+	BorrowerRepayment float64   `json:"borrower_repayment"`
+	InvestorROI       float64   `json:"investor_roi"`
+}

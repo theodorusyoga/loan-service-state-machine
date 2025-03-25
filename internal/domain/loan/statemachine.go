@@ -83,3 +83,19 @@ func (s *LoanService) InvestLoan(loan *Loan, lender *lender.Lender, amount float
 	}
 	return result, nil
 }
+
+func (s *LoanService) DisburseLoan(loan *Loan, fieldOfficeID string, agreementFileName string) (*response.DisbursementResponse, error) {
+	loanFSM := s.createFSM(loan)
+
+	result := &response.DisbursementResponse{}
+	ctx := context.WithValue(context.Background(), InvestResultKey, result)
+
+	err := loanFSM.Event(ctx, EventDisburse, loan, fieldOfficeID, agreementFileName)
+	if err != nil {
+		if errors.Is(err, fsm.NoTransitionError{}) {
+			return nil, errors.New("cannot disburse loan in current state")
+		}
+		return nil, err
+	}
+	return result, nil
+}

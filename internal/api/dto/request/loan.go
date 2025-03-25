@@ -13,9 +13,14 @@ type ApprovalRequest struct {
 }
 
 type StatusUpdateRequest struct {
-	ApprovalEmployeeID string  `json:"approval_employee_id" validate:"required"`
-	ApprovalDate       string  `json:"approval_date" validate:"required"`
-	FileName           string  `json:"file_name" validate:"required"`
-	LenderID           string  `json:"lender_id" validate:"required"`
-	InvestAmount       float64 `json:"invest_amount" validate:"required,gt=0"`
+	// approve
+	ApprovalEmployeeID string `json:"approval_employee_id" validate:"required"`
+	ApprovalDate       string `json:"approval_date" validate:"required"`
+	FileName           string `json:"file_name" validate:"required"`
+	// invest
+	LenderID     string  `json:"lender_id" validate:"required"`
+	InvestAmount float64 `json:"invest_amount" validate:"required,gt=0"`
+	// disburse
+	FieldOfficerID    string `json:"field_officer_id" validate:"required"`
+	AgreementFileName string `json:"agreement_file_name" validate:"required"`
 }

@@ -128,6 +128,12 @@ func (h *LoanHandler) UpdateLoanStatus(c echo.Context) error {
 		} else {
 			return c.JSON(http.StatusOK, response.Success(result, "loan status updated to invested"))
 		}
+	case string(loan.EventDisburse):
+		result, err := h.loanService.DisburseLoan(loanEntity, req.FieldOfficerID, req.AgreementFileName)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.Error(err.Error()))
+		}
+		return c.JSON(http.StatusOK, response.Success(result, "loan disbursed successfully"))
 
 	default:
 		return c.JSON(http.StatusBadRequest, response.Error("unsupported status transition"))
