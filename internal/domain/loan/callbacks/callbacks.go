@@ -4,13 +4,14 @@ import (
 	"github.com/looplab/fsm"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
 )
 
 // CallbackProvider provides callback functions for the loan state machine
 type CallbackProvider struct {
-	LenderRepository     loanlender.Repository
+	LenderRepository     lender.Repository
 	LoanRepository       loan.Repository
 	LoanLenderRepository loanlender.Repository
 	EmployeeRepository   employee.Repository
@@ -19,7 +20,7 @@ type CallbackProvider struct {
 }
 
 func New(
-	lenderRepo loanlender.Repository,
+	lenderRepo lender.Repository,
 	loanRepo loan.Repository,
 	loanLenderRepo loanlender.Repository,
 	empRepo employee.Repository,

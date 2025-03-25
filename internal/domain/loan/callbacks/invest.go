@@ -5,7 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/looplab/fsm"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/api/dto/response"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
@@ -18,7 +20,7 @@ func (p *CallbackProvider) registerInvestCallbacks(callbacks fsm.Callbacks) {
 
 func (p *CallbackProvider) beforeInvest(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
-	lender := e.Args[1].(lender.Lender)
+	lender := e.Args[1].(*lender.Lender)
 	amount := e.Args[2].(float64)
 
 	if amount <= 0 {
@@ -63,9 +65,8 @@ func (p *CallbackProvider) beforeInvest(ctx context.Context, e *fsm.Event) {
 
 func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
-	lender := e.Args[1].(lender.Lender)
+	lender := e.Args[1].(*lender.Lender)
 	amount := e.Args[2].(float64)
-	performedBy := e.Args[3].(string)
 
 	// Calculate current total investment
 	var currentInvestment float64
@@ -82,6 +83,7 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 	investedTime := time.Now()
 
 	loanLender := loanlender.LoanLender{
+		ID:        uuid.New().String(),
 		LoanID:    loanObj.ID,
 		LenderID:  lender.ID,
 		Amount:    amount,
@@ -107,7 +109,7 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 			To:          loan.Status(e.Dst),
 			Date:        investedTime,
 			Description: "Loan fully invested",
-			PerformedBy: performedBy,
+			PerformedBy: lender.ID,
 		})
 
 		// Update loan in DB
@@ -117,4 +119,12 @@ func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
 			return
 		}
 	}
+	if result, ok := ctx.Value(loan.InvestResultKey).(*response.LoanLenderResponse); ok {
+		// Copy values to the result pointer
+		*result = response.LoanLenderResponse{
+			RemainingAmount: loanObj.Amount - (currentInvestment + amount),
+			InvestedAmount:  currentInvestment + amount,
+		}
+	}
+
 }

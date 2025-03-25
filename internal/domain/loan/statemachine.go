@@ -5,6 +5,8 @@ import (
 	"errors"
 
 	"github.com/looplab/fsm"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/api/dto/response"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 )
 
 const (
@@ -59,4 +61,25 @@ func (s *LoanService) ApproveLoan(loan *Loan, approvedBy string, fileName string
 		return err
 	}
 	return nil
+}
+
+// Constants for context keys
+type contextKey string
+
+const InvestResultKey contextKey = "investResult"
+
+func (s *LoanService) InvestLoan(loan *Loan, lender *lender.Lender, amount float64) (*response.LoanLenderResponse, error) {
+	loanFSM := s.createFSM(loan)
+
+	result := &response.LoanLenderResponse{}
+	ctx := context.WithValue(context.Background(), InvestResultKey, result)
+
+	err := loanFSM.Event(ctx, EventInvest, loan, lender, amount)
+	if err != nil {
+		if errors.Is(err, fsm.NoTransitionError{}) {
+			return nil, errors.New("cannot invest loan in current state")
+		}
+		return nil, err
+	}
+	return result, nil
 }

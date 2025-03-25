@@ -22,3 +22,8 @@ type StatusTransitionDTO struct {
 	Description string    `json:"description"`
 	PerformedBy string    `json:"performedBy"`
 }
+
+type LoanLenderResponse struct {
+	RemainingAmount float64 `json:"remainingAmount"`
+	InvestedAmount  float64 `json:"investedAmount"`
+}

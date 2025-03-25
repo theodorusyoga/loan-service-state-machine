@@ -8,18 +8,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/dto/request"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/dto/response"
+	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/lender"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 )
 
 type LoanHandler struct {
-	loanService *loan.LoanService
-	validate    *validator.Validate
+	loanService   *loan.LoanService
+	lenderService *lender.LenderService
+	validate      *validator.Validate
 }
 
-func NewLoanHandler(loanService *loan.LoanService, validate *validator.Validate) *LoanHandler {
+func NewLoanHandler(loanService *loan.LoanService, lenderService *lender.LenderService, validate *validator.Validate) *LoanHandler {
 	return &LoanHandler{
-		loanService: loanService,
-		validate:    validate,
+		loanService:   loanService,
+		lenderService: lenderService,
+		validate:      validate,
 	}
 }
 
@@ -106,21 +109,35 @@ func (h *LoanHandler) UpdateLoanStatus(c echo.Context) error {
 	case string(loan.EventApprove):
 		err = h.loanService.ApproveLoan(loanEntity, req.ApprovalEmployeeID, req.FileName)
 	// TODO: Complete the statuses
-	// case "reject":
-	// 	err = h.loanService.RejectLoan(loan, req.UpdatedBy)
-	// case "disburse":
-	// 	err = h.loanService.DisburseLoan(loan, req.UpdatedBy)
-	// case "complete":
-	// 	err = h.loanService.CompleteLoan(loan, req.UpdatedBy)
+	case string(loan.EventInvest):
+		// check lender ID exists
+		if req.LenderID == "" {
+			return c.JSON(http.StatusBadRequest, response.Error("lender ID is required"))
+		}
+		// get lender
+		lender, lenderErr := h.lenderService.GetByID(c.Request().Context(), req.LenderID)
+		if lenderErr != nil {
+			return c.JSON(http.StatusBadRequest, response.Error(lenderErr.Error()))
+		}
+		result, err := h.loanService.InvestLoan(loanEntity, lender, req.InvestAmount)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, response.Error(err.Error()))
+		}
+		if result.RemainingAmount > 0 {
+			return c.JSON(http.StatusOK, response.Success(result, "loan invested successfully"))
+		} else {
+			return c.JSON(http.StatusOK, response.Success(result, "loan status updated to invested"))
+		}
+
 	default:
-		return c.JSON(http.StatusBadRequest, response.Error("Unsupported status transition"))
+		return c.JSON(http.StatusBadRequest, response.Error("unsupported status transition"))
 	}
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Error(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, response.Success("Loan status updated successfully"))
+	return c.JSON(http.StatusOK, response.Success(nil, "Loan status updated successfully"))
 }
 
 func formatValidationErrors(errors validator.ValidationErrors) string {
