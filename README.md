@@ -6,6 +6,9 @@ This project implements a loan service with state machine workflow management to
 
 ![](https://drive.google.com/file/d/1b1TFzZKkkFYHHHSqSYhSzYSl-GUvt8Q_/view?usp=sharing)
 
+Or click the link here if the video doesn't show up:
+ttps://drive.google.com/file/d/1b1TFzZKkkFYHHHSqSYhSzYSl-GUvt8Q_/view?usp=sharing
+
 ### Tech Stack
 
 - Go: Core programming language
