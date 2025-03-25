@@ -11,11 +11,11 @@ import (
 )
 
 func (p *CallbackProvider) registerApproveCallbacks(callbacks fsm.Callbacks) {
-	callbacks["before_"+loan.EventApprove] = p.beforeApprove
-	callbacks["after_"+loan.EventApprove] = p.afterApprove
+	callbacks["before_"+loan.EventApprove] = p.BeforeApproval
+	callbacks["after_"+loan.EventApprove] = p.AfterApproval
 }
 
-func (p *CallbackProvider) beforeApprove(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) BeforeApproval(ctx context.Context, e *fsm.Event) {
 	// TODO: Check document completeness
 	loanObj := e.Args[0].(*loan.Loan)
 	approvedBy := e.Args[1].(string)
@@ -46,7 +46,7 @@ func (p *CallbackProvider) beforeApprove(ctx context.Context, e *fsm.Event) {
 	}
 }
 
-func (p *CallbackProvider) afterApprove(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) AfterApproval(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
 	now := time.Now()
 	approvedBy := e.Args[1].(string)

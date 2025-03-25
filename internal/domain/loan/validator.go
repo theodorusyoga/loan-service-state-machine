@@ -4,7 +4,13 @@ import (
 	"fmt"
 )
 
+type StatusValidator interface {
+	Validate(loan *Loan, from, to Status) error
+}
+
 type DefaultStatusValidator struct{}
+
+var _ StatusValidator = (*DefaultStatusValidator)(nil)
 
 func NewDefaultStatusValidator() *DefaultStatusValidator {
 	return &DefaultStatusValidator{}

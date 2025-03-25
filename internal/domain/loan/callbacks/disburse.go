@@ -12,11 +12,11 @@ import (
 )
 
 func (p *CallbackProvider) registerDisburseCallbacks(callbacks fsm.Callbacks) {
-	callbacks["before_"+loan.EventDisburse] = p.beforeDisburse
-	callbacks["after_"+loan.EventDisburse] = p.afterDisburse
+	callbacks["before_"+loan.EventDisburse] = p.BeforeDisburse
+	callbacks["after_"+loan.EventDisburse] = p.AfterDisburse
 }
 
-func (p *CallbackProvider) beforeDisburse(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) BeforeDisburse(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
 	fieldOfficerId := e.Args[1].(string)
 	agreementDocFileName := e.Args[2].(string)
@@ -65,7 +65,7 @@ func (p *CallbackProvider) beforeDisburse(ctx context.Context, e *fsm.Event) {
 	}
 }
 
-func (p *CallbackProvider) afterDisburse(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) AfterDisburse(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
 	now := time.Now()
 	fieldOfficerId := e.Args[1].(string)

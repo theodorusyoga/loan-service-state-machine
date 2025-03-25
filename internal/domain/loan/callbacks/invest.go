@@ -15,11 +15,11 @@ import (
 )
 
 func (p *CallbackProvider) registerInvestCallbacks(callbacks fsm.Callbacks) {
-	callbacks["before_"+loan.EventInvest] = p.beforeInvest
-	callbacks["after_"+loan.EventInvest] = p.afterInvest
+	callbacks["before_"+loan.EventInvest] = p.BeforeInvest
+	callbacks["after_"+loan.EventInvest] = p.AfterInvest
 }
 
-func (p *CallbackProvider) beforeInvest(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) BeforeInvest(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
 	lender := e.Args[1].(*lender.Lender)
 	amount := e.Args[2].(float64)
@@ -64,7 +64,7 @@ func (p *CallbackProvider) beforeInvest(ctx context.Context, e *fsm.Event) {
 
 }
 
-func (p *CallbackProvider) afterInvest(ctx context.Context, e *fsm.Event) {
+func (p *CallbackProvider) AfterInvest(ctx context.Context, e *fsm.Event) {
 	loanObj := e.Args[0].(*loan.Loan)
 	lender := e.Args[1].(*lender.Lender)
 	amount := e.Args[2].(float64)

@@ -1,6 +1,8 @@
 package callbacks
 
 import (
+	"context"
+
 	"github.com/looplab/fsm"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/document"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/employee"
@@ -8,6 +10,21 @@ import (
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan"
 	loanlender "github.com/theodorusyoga/loan-service-state-machine/internal/domain/loan_lender"
 )
+
+type LoanCallbackProvider interface {
+	// GetCallbacks returns all registered callbacks for the FSM
+	GetCallbacks() fsm.Callbacks
+
+	// Specific callback methods for direct testing
+	BeforeApproval(ctx context.Context, e *fsm.Event)
+	AfterApproval(ctx context.Context, e *fsm.Event)
+
+	BeforeInvest(ctx context.Context, e *fsm.Event)
+	AfterInvest(ctx context.Context, e *fsm.Event)
+
+	BeforeDisburse(ctx context.Context, e *fsm.Event)
+	AfterDisburse(ctx context.Context, e *fsm.Event)
+}
 
 // CallbackProvider provides callback functions for the loan state machine
 type CallbackProvider struct {
@@ -18,6 +35,8 @@ type CallbackProvider struct {
 	DocumentRepository   document.Repository
 	Validator            loan.DefaultStatusValidator
 }
+
+var _ LoanCallbackProvider = (*CallbackProvider)(nil)
 
 func New(
 	lenderRepo lender.Repository,
