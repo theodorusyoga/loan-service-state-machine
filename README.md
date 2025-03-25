@@ -2,6 +2,10 @@
 
 This project implements a loan service with state machine workflow management to handle the different stages of loan processing from application (proposed status) to disbursement.
 
+### Introduction Video
+
+![](https://drive.google.com/file/d/1b1TFzZKkkFYHHHSqSYhSzYSl-GUvt8Q_/view?usp=sharing)
+
 ### Tech Stack
 
 - Go: Core programming language
