@@ -1,0 +1,513 @@
+basePath: /api/v1
+definitions:
+  borrower.Borrower:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      id_number:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.PaginatedResponse:
+    properties:
+      data: {}
+      pagination:
+        $ref: '#/definitions/domain.PaginationInfo'
+    type: object
+  domain.PaginationInfo:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  employee.Employee:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      id_number:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  lender.Lender:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: string
+      idnumber:
+        type: string
+      phoneNumber:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  request.CreateBorrowerRequest:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      idNumber:
+        type: string
+      phoneNumber:
+        type: string
+    required:
+    - email
+    - fullName
+    - idNumber
+    - phoneNumber
+    type: object
+  request.CreateEmployeeRequest:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      idNumber:
+        type: string
+      phoneNumber:
+        type: string
+    required:
+    - email
+    - fullName
+    - idNumber
+    - phoneNumber
+    type: object
+  request.CreateLenderRequest:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      idNumber:
+        type: string
+      phoneNumber:
+        type: string
+    required:
+    - email
+    - fullName
+    - idNumber
+    - phoneNumber
+    type: object
+  request.CreateLoanRequest:
+    properties:
+      amount:
+        type: number
+      borrowerId:
+        type: string
+      description:
+        type: string
+      rate:
+        type: number
+      roi:
+        type: number
+    required:
+    - amount
+    - borrowerId
+    - rate
+    - roi
+    type: object
+  response.APIResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  swagger.ApproveSchema:
+    properties:
+      approval_date:
+        example: "2025-03-25"
+        type: string
+      approval_employee_id:
+        example: emp-123
+        type: string
+      file_name:
+        example: approval_document.pdf
+        type: string
+    type: object
+  swagger.DisburseSchema:
+    properties:
+      agreement_file_name:
+        example: loan_agreement.pdf
+        type: string
+      field_officer_id:
+        example: emp-789
+        type: string
+    type: object
+  swagger.InvestSchema:
+    properties:
+      invest_amount:
+        example: 5000
+        type: number
+      lender_id:
+        example: lender-456
+        type: string
+    type: object
+host: localhost:5002
+info:
+  contact: {}
+  description: API for managing loans with a state machine workflow
+  title: Loan Service API
+  version: "1.0"
+paths:
+  /borrowers:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all borrowers with optional filtering
+      parameters:
+      - description: Filter by full name
+        in: query
+        name: full_name
+        type: string
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone number
+        in: query
+        name: phone_number
+        type: string
+      - description: Filter by ID number
+        in: query
+        name: id_number
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of borrowers
+          schema:
+            allOf:
+            - $ref: '#/definitions/domain.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/borrower.Borrower'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: List all borrowers
+      tags:
+      - borrowers
+    post:
+      consumes:
+      - application/json
+      description: Register a new borrower in the system
+      parameters:
+      - description: Borrower information
+        in: body
+        name: borrower
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateBorrowerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Borrower created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/borrower.Borrower'
+              type: object
+        "400":
+          description: Invalid request or validation error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new borrower
+      tags:
+      - borrowers
+  /employees:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all employees with optional filtering
+      parameters:
+      - description: Filter by full name
+        in: query
+        name: full_name
+        type: string
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone number
+        in: query
+        name: phone_number
+        type: string
+      - description: Filter by ID number
+        in: query
+        name: id_number
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of employees
+          schema:
+            allOf:
+            - $ref: '#/definitions/domain.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/employee.Employee'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: List all employees
+      tags:
+      - employees
+    post:
+      consumes:
+      - application/json
+      description: Register a new employee in the system
+      parameters:
+      - description: Employee information
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Employee created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/employee.Employee'
+              type: object
+        "400":
+          description: Invalid request or validation error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new employee
+      tags:
+      - employees
+  /lenders:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all lenders with optional filtering
+      parameters:
+      - description: Filter by full name
+        in: query
+        name: full_name
+        type: string
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone number
+        in: query
+        name: phone_number
+        type: string
+      - description: Filter by ID number
+        in: query
+        name: id_number
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of lenders
+          schema:
+            allOf:
+            - $ref: '#/definitions/domain.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/lender.Lender'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: List all lenders
+      tags:
+      - lenders
+    post:
+      consumes:
+      - application/json
+      description: Register a new lender in the system
+      parameters:
+      - description: Lender information
+        in: body
+        name: lender
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateLenderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Lender created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/lender.Lender'
+              type: object
+        "400":
+          description: Invalid request or validation error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new lender
+      tags:
+      - lenders
+  /loans:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all loans with optional filtering
+      parameters:
+      - description: Maximum loan amount
+        in: query
+        name: max_amount
+        type: number
+      - description: Minimum loan amount
+        in: query
+        name: min_amount
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: List all loans
+      tags:
+      - loans
+    post:
+      consumes:
+      - application/json
+      description: Create a new loan with the provided details
+      parameters:
+      - description: Loan information
+        in: body
+        name: loan
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateLoanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new loan
+      tags:
+      - loans
+  /loans/{id}/{status}:
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        Update a loan's status based on the provided status transition
+        - For approve: { "success": true, "message": "Loan status updated successfully" }
+        - For partial invest: { "success": true, "data": { "remaining_amount": 150000, "invested_amount": 50000, "agreement_document": null }, "message": "loan invested successfully" }
+        - For full invest: { "success": true, "data": { "remaining_amount": 0, "invested_amount": 200000, "agreement_document": "agreement_file.pdf" }, "message": "loan status updated to invested" }
+        - For disburse: { "success": true, "data": { "field_officer_id": "emp-789", "agreement_file_name": "agreement.pdf" }, "message": "loan disbursed successfully" }
+      parameters:
+      - description: Loan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New status
+        in: path
+        name: status
+        required: true
+        type: string
+      - description: Status update information
+        in: body
+        name: request
+        required: true
+        schema:
+          type: object
+      - description: Approve request (when status=approve)
+        in: body
+        name: approveRequest
+        schema:
+          $ref: '#/definitions/swagger.ApproveSchema'
+      - description: Invest request (when status=invest)
+        in: body
+        name: investRequest
+        schema:
+          $ref: '#/definitions/swagger.InvestSchema'
+      - description: Disburse request (when status=disburse)
+        in: body
+        name: disburseRequest
+        schema:
+          $ref: '#/definitions/swagger.DisburseSchema'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful status update with varying response structure based
+            on status
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Invalid request or status transition
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Update loan status
+      tags:
+      - loans
+swagger: "2.0"

@@ -22,6 +22,16 @@ func NewBorrowerHandler(borrowerService *borrower.BorrowerService, validate *val
 	}
 }
 
+// CreateBorrower godoc
+// @Summary Create a new borrower
+// @Description Register a new borrower in the system
+// @Tags borrowers
+// @Accept json
+// @Produce json
+// @Param borrower body request.CreateBorrowerRequest true "Borrower information"
+// @Success 201 {object} response.APIResponse{data=borrower.Borrower} "Borrower created successfully"
+// @Failure 400 {object} response.APIResponse "Invalid request or validation error"
+// @Router /borrowers [post]
 func (h *BorrowerHandler) CreateBorrower(c echo.Context) error {
 	var req request.CreateBorrowerRequest
 	if err := c.Bind(&req); err != nil {
@@ -44,6 +54,19 @@ func (h *BorrowerHandler) CreateBorrower(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Success(borrower, "Borrower created successfully"))
 }
 
+// ListBorrowers godoc
+// @Summary List all borrowers
+// @Description Get a list of all borrowers with optional filtering
+// @Tags borrowers
+// @Accept json
+// @Produce json
+// @Param full_name query string false "Filter by full name"
+// @Param email query string false "Filter by email"
+// @Param phone_number query string false "Filter by phone number"
+// @Param id_number query string false "Filter by ID number"
+// @Success 200 {object} domain.PaginatedResponse{data=[]borrower.Borrower} "List of borrowers"
+// @Failure 500 {object} response.APIResponse "Internal server error"
+// @Router /borrowers [get]
 func (h *BorrowerHandler) ListBorrowers(c echo.Context) error {
 	// Extract query parameters for filtering
 	fullName := c.QueryParam("full_name")

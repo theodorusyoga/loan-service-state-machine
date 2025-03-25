@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/theodorusyoga/loan-service-state-machine/config"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/api/handler"
 	"github.com/theodorusyoga/loan-service-state-machine/internal/domain/borrower"
@@ -117,6 +118,8 @@ func registerRoutes(lc fx.Lifecycle,
 	borrowerHandler *handler.BorrowerHandler, emp *handler.EmployeeHandler,
 	lenderHandler *handler.LenderHandler) {
 	api := e.Group("/api/v1")
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	loans := api.Group("/loans")
 	loans.GET("", loanHandler.ListLoans)

@@ -22,6 +22,16 @@ func NewEmployeeHandler(employeeService *employee.EmployeeService, validate *val
 	}
 }
 
+// CreateEmployee godoc
+// @Summary Create a new employee
+// @Description Register a new employee in the system
+// @Tags employees
+// @Accept json
+// @Produce json
+// @Param employee body request.CreateEmployeeRequest true "Employee information"
+// @Success 201 {object} response.APIResponse{data=employee.Employee} "Employee created successfully"
+// @Failure 400 {object} response.APIResponse "Invalid request or validation error"
+// @Router /employees [post]
 func (h *EmployeeHandler) CreateEmployee(c echo.Context) error {
 	var req request.CreateEmployeeRequest
 	if err := c.Bind(&req); err != nil {
@@ -44,6 +54,19 @@ func (h *EmployeeHandler) CreateEmployee(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Success(employee, "Employee created successfully"))
 }
 
+// ListEmployees godoc
+// @Summary List all employees
+// @Description Get a list of all employees with optional filtering
+// @Tags employees
+// @Accept json
+// @Produce json
+// @Param full_name query string false "Filter by full name"
+// @Param email query string false "Filter by email"
+// @Param phone_number query string false "Filter by phone number"
+// @Param id_number query string false "Filter by ID number"
+// @Success 200 {object} domain.PaginatedResponse{data=[]employee.Employee} "List of employees"
+// @Failure 500 {object} response.APIResponse "Internal server error"
+// @Router /employees [get]
 func (h *EmployeeHandler) ListEmployees(c echo.Context) error {
 	// Extract query parameters for filtering
 	fullName := c.QueryParam("full_name")

@@ -22,6 +22,16 @@ func NewLenderHandler(lenderService *lender.LenderService, validate *validator.V
 	}
 }
 
+// CreateLender godoc
+// @Summary Create a new lender
+// @Description Register a new lender in the system
+// @Tags lenders
+// @Accept json
+// @Produce json
+// @Param lender body request.CreateLenderRequest true "Lender information"
+// @Success 201 {object} response.APIResponse{data=lender.Lender} "Lender created successfully"
+// @Failure 400 {object} response.APIResponse "Invalid request or validation error"
+// @Router /lenders [post]
 func (h *LenderHandler) CreateLender(c echo.Context) error {
 	var req request.CreateLenderRequest
 	if err := c.Bind(&req); err != nil {
@@ -44,6 +54,19 @@ func (h *LenderHandler) CreateLender(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Success(lender, "Lender created successfully"))
 }
 
+// ListLenders godoc
+// @Summary List all lenders
+// @Description Get a list of all lenders with optional filtering
+// @Tags lenders
+// @Accept json
+// @Produce json
+// @Param full_name query string false "Filter by full name"
+// @Param email query string false "Filter by email"
+// @Param phone_number query string false "Filter by phone number"
+// @Param id_number query string false "Filter by ID number"
+// @Success 200 {object} domain.PaginatedResponse{data=[]lender.Lender} "List of lenders"
+// @Failure 500 {object} response.APIResponse "Internal server error"
+// @Router /lenders [get]
 func (h *LenderHandler) ListLenders(c echo.Context) error {
 	// Extract query parameters for filtering
 	fullName := c.QueryParam("full_name")

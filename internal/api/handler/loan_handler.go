@@ -26,6 +26,17 @@ func NewLoanHandler(loanService *loan.LoanService, lenderService *lender.LenderS
 	}
 }
 
+// ListLoans godoc
+// @Summary List all loans
+// @Description Get a list of all loans with optional filtering
+// @Tags loans
+// @Accept json
+// @Produce json
+// @Param max_amount query number false "Maximum loan amount"
+// @Param min_amount query number false "Minimum loan amount"
+// @Success 200 {object} domain.PaginatedResponse
+// @Failure 500 {object} response.APIResponse
+// @Router /loans [get]
 func (h *LoanHandler) ListLoans(c echo.Context) error {
 	// Extract query parameters for filtering
 	maxAmountStr := c.QueryParam("max_amount")
@@ -60,6 +71,16 @@ func (h *LoanHandler) ListLoans(c echo.Context) error {
 	return c.JSON(http.StatusOK, borrowers)
 }
 
+// CreateLoan godoc
+// @Summary Create a new loan
+// @Description Create a new loan with the provided details
+// @Tags loans
+// @Accept json
+// @Produce json
+// @Param loan body request.CreateLoanRequest true "Loan information"
+// @Success 201 {object} response.APIResponse
+// @Failure 400 {object} response.APIResponse
+// @Router /loans [post]
 func (h *LoanHandler) CreateLoan(c echo.Context) error {
 	var req request.CreateLoanRequest
 	if err := c.Bind(&req); err != nil {
@@ -82,6 +103,25 @@ func (h *LoanHandler) CreateLoan(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response.Success(loan, "Loan created successfully"))
 }
 
+// UpdateLoanStatus godoc
+// @Summary Update loan status
+// @Description Update a loan's status based on the provided status transition
+// @Description - For approve: { "success": true, "message": "Loan status updated successfully" }
+// @Description - For partial invest: { "success": true, "data": { "remaining_amount": 150000, "invested_amount": 50000, "agreement_document": null }, "message": "loan invested successfully" }
+// @Description - For full invest: { "success": true, "data": { "remaining_amount": 0, "invested_amount": 200000, "agreement_document": "agreement_file.pdf" }, "message": "loan status updated to invested" }
+// @Description - For disburse: { "success": true, "data": { "field_officer_id": "emp-789", "agreement_file_name": "agreement.pdf" }, "message": "loan disbursed successfully" }
+// @Tags loans
+// @Accept json
+// @Produce json
+// @Param id path string true "Loan ID"
+// @Param status path string true "New status"
+// @Param request body object true "Status update information"
+// @Param approveRequest body swagger.ApproveSchema false "Approve request (when status=approve)"
+// @Param investRequest body swagger.InvestSchema false "Invest request (when status=invest)"
+// @Param disburseRequest body swagger.DisburseSchema false "Disburse request (when status=disburse)"
+// @Success 200 {object} response.APIResponse "Successful status update with varying response structure based on status"
+// @Failure 400 {object} response.APIResponse "Invalid request or status transition"
+// @Router /loans/{id}/{status} [patch]
 func (h *LoanHandler) UpdateLoanStatus(c echo.Context) error {
 	loanID := c.Param("id")
 	newStatus := c.Param("status")
